@@ -1,0 +1,14 @@
+{
+  "name": "framestack-workspace",
+  "private": true,
+  "packageManager": "pnpm@12.22.0",
+  "engines": {
+    "node": ">=26.13.1 <27"
+  },
+  "scripts": {
+    "docs:dev": "pnpm --filter @framestack/docs start",
+    "docs:build": "pnpm --filter @framestack/docs build",
+    "docs:serve": "pnpm --filter @framestack/docs serve",
+    "check": "pnpm --filter @framestack/docs typecheck && pnpm --filter @framestack/docs build"
+  }
+}

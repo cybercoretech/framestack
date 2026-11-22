@@ -1,0 +1,60 @@
+# Local agent context (never commit)
+/AGENT_HANDOFF.md
+
+# Secrets and local configuration
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+secrets/
+.private/
+
+# Rust
+/target/
+**/*.rs.bk
+
+# Node.js / TypeScript
+node_modules/
+.npm/
+.pnpm-store/
+.turbo/
+.next/
+.nuxt/
+.svelte-kit/
+dist/
+build/
+coverage/
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+
+# Cloud / deployment tooling
+.wrangler/
+.terraform/
+.terraform.lock.hcl
+.serverless/
+
+# Logs and temporary files
+*.log
+*.tmp
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Editors
+.idea/
+.vscode/
+*.code-workspace
+
+# Docusaurus website build artifacts
+/website/.docusaurus/

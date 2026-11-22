@@ -1,0 +1,112 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  repository-policy:
+    name: Repository policy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Verify local handoff is ignored
+        shell: bash
+        run: |
+          set -euo pipefail
+          git check-ignore -q AGENT_HANDOFF.md
+          if git ls-files --error-unmatch AGENT_HANDOFF.md >/dev/null 2>&1; then
+            echo "AGENT_HANDOFF.md must never be tracked." >&2
+            exit 1
+          fi
+
+      - name: Require lockfiles when manifests exist
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -f Cargo.toml && ! -f Cargo.lock ]]; then
+            echo "Cargo.toml exists but Cargo.lock is missing." >&2
+            exit 1
+          fi
+          if [[ -f package.json && ! -f package-lock.json && ! -f pnpm-lock.yaml ]]; then
+            echo "package.json exists but package-lock.json or pnpm-lock.yaml is missing." >&2
+            exit 1
+          fi
+
+      - name: Check patch whitespace
+        run: git diff --check
+
+  documentation:
+    name: Markdown lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Lint Markdown
+        uses: DavidAnson/markdownlint-cli2-action@v19
+        with:
+          globs: "**/*.md"
+
+      - name: Validate documentation links
+        uses: lycheeverse/lychee-action@v2
+        with:
+          args: --verbose --no-progress --exclude-mail --max-retries 2 "./**/*.md" "./**/*.mdx"
+
+  rust:
+    name: Rust stable gate
+    if: ${{ hashFiles('Cargo.toml') != '' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install stable Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy, rustfmt
+
+      - name: Check formatting
+        run: cargo fmt --all -- --check
+
+      - name: Run Clippy
+        run: cargo clippy --workspace --all-targets --locked -- -D warnings
+
+      - name: Run tests
+        run: cargo test --workspace --all-targets --locked
+
+  typescript:
+    name: TypeScript stable gate
+    if: ${{ hashFiles('package.json') != '' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 12.22.0
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Install and validate pnpm workspace
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm run check --if-present
+          pnpm run test --if-present

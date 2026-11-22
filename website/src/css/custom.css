@@ -1,0 +1,234 @@
+/**
+ * FrameStack / CyberCore theme bridge.
+ *
+ * CyberCore's shared chooser paints these palette slots on <html>:
+ * --bg, --white, --panel, --line, --muted, --acid, --pink, --purple,
+ * --cyan, --orange, and --red. Docusaurus/Infima tokens map to those slots.
+ */
+
+:root {
+  color-scheme: dark;
+
+  --bg: #09080f;
+  --white: #f0f0f2;
+  --panel: #16151f;
+  --line: #32303e;
+  --muted: #807f8b;
+  --acid: #39ff33;
+  --pink: #ff147f;
+  --purple: #8a22e2;
+  --cyan: #00e5ff;
+  --orange: #ff9000;
+  --red: #f1142d;
+
+  --ifm-color-primary: var(--purple);
+  --ifm-color-primary-dark: color-mix(in srgb, var(--purple) 82%, black);
+  --ifm-color-primary-darker: color-mix(in srgb, var(--purple) 68%, black);
+  --ifm-color-primary-darkest: color-mix(in srgb, var(--purple) 54%, black);
+  --ifm-color-primary-light: color-mix(in srgb, var(--purple) 82%, white);
+  --ifm-color-primary-lighter: color-mix(in srgb, var(--purple) 68%, white);
+  --ifm-color-primary-lightest: color-mix(in srgb, var(--purple) 54%, white);
+
+  --ifm-background-color: var(--bg);
+  --ifm-background-surface-color: var(--panel);
+  --ifm-font-color-base: var(--white);
+  --ifm-font-color-secondary: var(--muted);
+  --ifm-color-content: var(--white);
+  --ifm-color-content-secondary: var(--muted);
+  --ifm-link-color: var(--cyan);
+  --ifm-link-hover-color: var(--pink);
+  --ifm-navbar-background-color: var(--panel);
+  --ifm-navbar-link-color: var(--white);
+  --ifm-navbar-link-hover-color: var(--cyan);
+  --ifm-footer-background-color: var(--panel);
+  --ifm-footer-color: var(--white);
+  --ifm-footer-link-color: var(--white);
+  --ifm-footer-title-color: var(--white);
+  --ifm-toc-border-color: var(--line);
+  --ifm-hr-border-color: var(--line);
+  --ifm-table-border-color: var(--line);
+  --ifm-menu-color: var(--muted);
+  --ifm-menu-color-active: var(--cyan);
+  --ifm-code-background: var(--panel);
+  --ifm-pre-background: var(--panel);
+  --ifm-color-success: var(--acid);
+  --ifm-color-info: var(--cyan);
+  --ifm-color-warning: var(--orange);
+  --ifm-color-danger: var(--red);
+
+  --ifm-font-family-base: Inter, ui-sans-serif, system-ui, -apple-system,
+    BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --ifm-font-family-monospace: "JetBrains Mono", "Fira Code", ui-monospace,
+    SFMono-Regular, Menlo, Consolas, monospace;
+  --ifm-heading-font-family: var(--ifm-font-family-monospace);
+  --ifm-heading-font-weight: 700;
+  --ifm-code-font-size: 90%;
+
+  --ifm-global-radius: 0;
+  --ifm-button-border-radius: 0;
+  --ifm-card-border-radius: 0;
+  --ifm-alert-border-left-width: 3px;
+  --ifm-navbar-shadow: 0 1px 0 var(--line);
+}
+
+/* Docusaurus's dark-mode selector has greater specificity than :root. */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --ifm-color-primary: var(--purple);
+  --ifm-background-color: var(--bg);
+  --ifm-background-surface-color: var(--panel);
+  --ifm-font-color-base: var(--white);
+  --ifm-font-color-secondary: var(--muted);
+  --ifm-color-content: var(--white);
+  --ifm-color-content-secondary: var(--muted);
+  --ifm-link-color: var(--cyan);
+  --ifm-link-hover-color: var(--pink);
+  --ifm-navbar-background-color: var(--panel);
+  --ifm-navbar-link-color: var(--white);
+  --ifm-navbar-link-hover-color: var(--cyan);
+  --ifm-footer-background-color: var(--panel);
+  --ifm-footer-color: var(--white);
+  --ifm-footer-link-color: var(--white);
+  --ifm-footer-title-color: var(--white);
+  --ifm-toc-border-color: var(--line);
+  --ifm-hr-border-color: var(--line);
+  --ifm-table-border-color: var(--line);
+  --ifm-menu-color: var(--muted);
+  --ifm-menu-color-active: var(--cyan);
+  --ifm-code-background: var(--panel);
+  --ifm-pre-background: var(--panel);
+}
+
+html,
+body {
+  background: var(--bg);
+}
+
+body {
+  color: var(--white);
+}
+
+.navbar {
+  border-bottom: 1px solid var(--line);
+}
+
+.navbar__title,
+.navbar__link,
+.menu__link,
+.table-of-contents__link {
+  font-family: var(--ifm-font-family-monospace);
+}
+
+.navbar__title {
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.navbar__items--right {
+  gap: 0.65rem;
+}
+
+.framestack-theme-control {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+cybercore-theme-chooser {
+  --ccx-font: var(--ifm-font-family-monospace);
+  --ccx-size: 0.68rem;
+  --ccx-case: uppercase;
+  --ccx-tracking: 0.08em;
+  --ccx-bg: var(--panel);
+  --ccx-field: var(--bg);
+  --ccx-fg: var(--white);
+  --ccx-muted: var(--muted);
+  --ccx-line: var(--line);
+  --ccx-accent: var(--pink);
+  --ccx-focus: var(--cyan);
+  --ccx-glow: 0.75;
+}
+
+.hero {
+  background:
+    radial-gradient(
+      ellipse at 80% 0%,
+      color-mix(in srgb, var(--purple) 18%, transparent),
+      transparent 58%
+    ),
+    linear-gradient(135deg, var(--panel), var(--bg));
+  border-bottom: 1px solid var(--line);
+}
+
+.hero__title {
+  letter-spacing: -0.045em;
+}
+
+.hero__subtitle {
+  color: var(--muted);
+}
+
+.button {
+  border-radius: 0;
+  font-family: var(--ifm-font-family-monospace);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.button--primary {
+  color: var(--bg);
+  background: var(--cyan);
+  border-color: var(--cyan);
+}
+
+.button--primary:hover {
+  color: var(--bg);
+  background: var(--acid);
+  border-color: var(--acid);
+}
+
+.card {
+  height: 100%;
+  border: 1px solid var(--line);
+  border-radius: 0;
+  background: var(--panel);
+}
+
+code,
+pre {
+  border-radius: 0 !important;
+}
+
+.theme-doc-markdown a,
+.footer a {
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+}
+
+:focus-visible {
+  outline: 2px solid var(--cyan);
+  outline-offset: 3px;
+}
+
+@media (max-width: 996px) {
+  .navbar__items--right {
+    gap: 0.35rem;
+  }
+
+  .framestack-theme-control {
+    margin-inline-end: 0.15rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
