@@ -62,7 +62,7 @@ jobs:
       - name: Validate documentation links
         uses: lycheeverse/lychee-action@v2
         with:
-          args: --verbose --no-progress --exclude-mail --max-retries 2 "./**/*.md" "./**/*.mdx"
+          args: --verbose --no-progress --max-retries 2 "./**/*.md" "./**/*.mdx"
 
   # hashFiles() is not available in job-level `if`, so detect manifests here.
   detect:
@@ -129,5 +129,5 @@ jobs:
       - name: Install and validate pnpm workspace
         run: |
           pnpm install --frozen-lockfile
-          pnpm run check --if-present
-          pnpm run test --if-present
+          pnpm run --if-present check
+          pnpm run --if-present test
