@@ -8,7 +8,7 @@ type RootProps = {
  * Mount the shared CyberCore web component after React has hydrated.
  * This avoids asking React to hydrate DOM that the custom element rewrites.
  */
-export default function Root({children}: RootProps): JSX.Element {
+export default function Root({children}: RootProps): ReactNode {
   useEffect(() => {
     const navbarItems = document.querySelector('.navbar__items--right');
     if (!navbarItems || navbarItems.querySelector('cybercore-theme-chooser')) {
