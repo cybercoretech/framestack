@@ -64,9 +64,29 @@ jobs:
         with:
           args: --verbose --no-progress --exclude-mail --max-retries 2 "./**/*.md" "./**/*.mdx"
 
+  # hashFiles() is not available in job-level `if`, so detect manifests here.
+  detect:
+    name: Detect workspaces
+    runs-on: ubuntu-latest
+    outputs:
+      rust: ${{ steps.manifests.outputs.rust }}
+      typescript: ${{ steps.manifests.outputs.typescript }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Find workspace manifests
+        id: manifests
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -f Cargo.toml ]]; then echo "rust=true" >> "$GITHUB_OUTPUT"; else echo "rust=false" >> "$GITHUB_OUTPUT"; fi
+          if [[ -f package.json ]]; then echo "typescript=true" >> "$GITHUB_OUTPUT"; else echo "typescript=false" >> "$GITHUB_OUTPUT"; fi
+
   rust:
     name: Rust stable gate
-    if: ${{ hashFiles('Cargo.toml') != '' }}
+    needs: detect
+    if: ${{ needs.detect.outputs.rust == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
@@ -88,7 +108,8 @@ jobs:
 
   typescript:
     name: TypeScript stable gate
-    if: ${{ hashFiles('package.json') != '' }}
+    needs: detect
+    if: ${{ needs.detect.outputs.typescript == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
