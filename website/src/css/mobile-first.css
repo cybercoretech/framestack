@@ -1,0 +1,20 @@
+/* Mobile first (phones and tablets only; laptops and desktops untouched).
+   Injected as <style id="cc-mobile-first"> by docusaurus.config.ts. */
+@media (max-width: 1024px) {
+  /* Nothing may make the page wider than the screen. */
+  pre { max-width: 100%; overflow-x: auto; }
+  img, video, svg { max-width: 100%; height: auto; }
+  .theme-doc-markdown table { display: block; max-width: 100%; overflow-x: auto; }
+  :not(pre) > code { overflow-wrap: anywhere; }
+  .navbar__brand { margin-right: 6px; }
+  .navbar__title { font-size: 13px; }
+  .master-docs { padding: 4px 7px; letter-spacing: .02em; }
+}
+@media (max-width: 420px) {
+  .navbar__title { display: none; }
+}
+@media (pointer: coarse) {
+  /* Finger-sized targets. */
+  .menu__link, .table-of-contents__link, .footer__link-item, .pagination-nav__link { min-height: 24px; }
+  .footer__link-item { display: inline-flex; align-items: center; }
+}

@@ -1,13 +1,23 @@
+import {readFileSync} from 'node:fs';
 import type {Config} from '@docusaurus/types';
 
 const cybercoreChooserCss =
   'https://cybercoretech.github.io/kit/chooser.css';
 const cybercoreChooserModule =
   'https://cybercoretech.github.io/kit/chooser.js';
+const cybercoreContactModule =
+  'https://cybercoretech.github.io/kit/contact.js';
+const fontsCss =
+  'https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap';
+
+// Phone and tablet fixes, kept apart so desktop renders identically without them
+// (checked with the Cybercore rollout tool deskdiff.mjs).
+const mobileFirstCss = readFileSync(new URL('./src/css/mobile-first.css', import.meta.url), 'utf8');
 
 const config: Config = {
   title: 'FrameStack',
-  tagline: 'Compose full-stack systems across frameworks and languages',
+  tagline: 'One manifest for the whole system. Checked, graphed and planned before anything runs.',
+  favicon: 'img/favicon.svg',
   url: 'https://cybercoretech.github.io',
   baseUrl: '/framestack/',
   organizationName: 'cybercoretech',
@@ -36,8 +46,13 @@ const config: Config = {
       attributes: {},
       innerHTML: `
         window.SITE = {
-          defaultTheme: 'cybercore-tech',
-          siteLabel: 'FrameStack'
+          defaultTheme: 'framestack-stack-trace',
+          siteLabel: 'FRAMESTACK',
+          mashups: [
+            { id: 'framestack-stack-trace', label: 'STACK TRACE', base: 'cyberdyne-steel', accent: 'neosynth-plasma' },
+            { id: 'framestack-graph-noir', label: 'GRAPH NOIR', base: 'dystopian-ward', accent: 'cyberpunk-hacker' },
+            { id: 'framestack-signal-weave', label: 'SIGNAL WEAVE', base: 'kanagawa', accent: 'synthwave-sunset' }
+          ]
         };
 
         document.addEventListener('cc:theme', () => {
@@ -57,9 +72,24 @@ const config: Config = {
         src: cybercoreChooserModule,
       },
     },
+    {
+      tagName: 'script',
+      attributes: {
+        type: 'module',
+        src: cybercoreContactModule,
+      },
+    },
+    {tagName: 'meta', attributes: {name: 'theme-color', content: '#05070b'}},
+    {tagName: 'link', attributes: {rel: 'preconnect', href: 'https://fonts.googleapis.com'}},
+    {tagName: 'link', attributes: {rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: 'anonymous'}},
+    {tagName: 'style', attributes: {id: 'cc-mobile-first'}, innerHTML: mobileFirstCss},
   ],
 
   stylesheets: [
+    {
+      href: fontsCss,
+      rel: 'stylesheet',
+    },
     {
       href: cybercoreChooserCss,
       rel: 'stylesheet',
@@ -102,6 +132,11 @@ const config: Config = {
   ],
 
   themeConfig: {
+    image: 'img/social.png',
+    metadata: [
+      {name: 'twitter:card', content: 'summary_large_image'},
+      {name: 'color-scheme', content: 'dark'},
+    ],
     colorMode: {
       defaultMode: 'dark',
       disableSwitch: true,
@@ -109,13 +144,21 @@ const config: Config = {
     },
     navbar: {
       title: 'FrameStack',
+      logo: {alt: 'FrameStack', src: 'img/favicon.svg', width: 26, height: 26},
       items: [
+        {
+          type: 'html',
+          position: 'left',
+          value: '<span class="framestack-path" aria-hidden="true">~/cybercore/framestack <b>main</b></span>',
+        },
         {
           type: 'docSidebar',
           sidebarId: 'docsSidebar',
           position: 'left',
-          label: 'Documentation',
+          label: 'docs',
         },
+        {to: '/docs/reference/cli', label: 'cli', position: 'left'},
+        {to: '/docs/reference/manifest', label: 'manifest', position: 'left'},
         {
           type: 'search',
           position: 'right',
@@ -132,22 +175,26 @@ const config: Config = {
       style: 'dark',
       links: [
         {
-          title: 'Project',
+          title: 'project',
           items: [
             {label: 'GitHub', href: 'https://github.com/cybercoretech/framestack'},
+            {label: 'Reference app', href: 'https://github.com/cybercoretech/framestack/tree/main/examples/rust-leptos-axum'},
             {label: 'Architecture blueprint', to: '/docs/BLUEPRINT'},
             {label: 'Roadmap', to: '/docs/ROADMAP'},
           ],
         },
         {
-          title: 'Documentation',
+          title: 'reference',
           items: [
+            {label: 'CLI', to: '/docs/reference/cli'},
+            {label: 'Manifest', to: '/docs/reference/manifest'},
+            {label: 'Adapters', to: '/docs/reference/adapters'},
             {label: 'Documentation standards', to: '/docs/documentation/STANDARDS'},
             {label: 'Architecture decisions', to: '/docs/decisions/project-scope'},
           ],
         },
       ],
-      copyright: `Copyright © ${new Date().getFullYear()} Cybercore Tech. Built with Docusaurus.`,
+      copyright: 'Copyright (c) 2026 Cybercore Tech · FrameStack · built with Docusaurus',
     },
   },
 };
