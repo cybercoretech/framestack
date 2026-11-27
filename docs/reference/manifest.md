@@ -100,7 +100,7 @@ Capability IDs come from the vocabulary in [ADR-0006](../decisions/0006-capabili
 
 A requirement is satisfied when the component provides the capability itself, or when a component it has a `runtime_dependency` or `communicates_with` relationship to provides it. A `build_dependency` never satisfies a requirement, because building something says nothing about what it does at runtime.
 
-In this version, capabilities are declared on components. Integration descriptors that declare capabilities for you, as ADR-0006 describes, come with the first adapters.
+Capabilities are declared on components. When a component is planned, every capability it declares must be one its [adapter](adapters.md) provides (FS019).
 
 ## Validation rules
 
@@ -126,6 +126,17 @@ Errors make the manifest invalid and `framestack check` exits with code 1. Warni
 | FS016 | error | An integration ID does not match the ID format. |
 | FS017 | error | The project name is blank. |
 | FS018 | warning | The same entry appears twice in one list. |
+
+These codes come from planning and running (`framestack plan`, `build` and `dev`), not from `check`. See [Adapters](adapters.md).
+
+| Code | Severity | Rule |
+| --- | --- | --- |
+| FS019 | error | A component declares a capability its adapter does not provide. |
+| FS020 | error | No adapter handles the component's integrations. |
+| FS021 | error | A required tool is missing, or its version command fails. |
+| FS022 | error | A step failed, was stopped by a signal, or could not start. |
+| FS023 | error | An integration setting is not supported by its adapter. |
+| FS024 | error | The adapter cannot perform the requested operation for this component. |
 
 ## Normalized JSON
 

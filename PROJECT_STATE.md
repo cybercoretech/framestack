@@ -1,9 +1,9 @@
 # FrameStack Project State
 
-**Stage:** 1 — Core project model and CLI  
+**Stage:** 2 — First Rust vertical slice  
 **Repository:** `cybercoretech/framestack`  
 **Local workspace:** `/home/raven/Devspace/Cybercore/tooling/framestack`  
-**Status:** The `framestack` CLI creates, checks and inspects manifests. No adapters or integrations exist yet.
+**Status:** The `framestack` CLI checks manifests and builds and runs the Leptos + Axum reference application through its first adapter, proven in CI.
 
 ## Confirmed direction
 
@@ -32,15 +32,13 @@
 - [x] Define the first version of the application manifest and core contracts (`docs/reference/manifest.md`, `schemas/framestack-manifest-v1.schema.json`, `fixtures/manifest/`).
 - [x] Select Rust workspace and TypeScript package-manager conventions (Cargo workspace in `crates/`, pnpm workspace for `website/`).
 - [x] Rust core (`framestack-core`) and CLI (`framestack init`, `check`, `graph`, `inspect`) with tests in CI.
-- [ ] Implement the smallest useful vertical slice: the Leptos + Axum reference stack with build and dev plans.
+- [x] Implement the smallest useful vertical slice: the Leptos + Axum reference stack (`examples/rust-leptos-axum`), `framestack plan`, `build` and `dev`, and a CI job that builds and smoke-tests it.
 
 ## Immediate next actions
 
-1. Add the Leptos + Axum reference application under `examples/` and its `framestack.toml`.
-2. Define the adapter `plan` output and add `framestack plan build` and `framestack plan dev`.
-3. Add a Cargo adapter that executes a plan only when explicitly approved (`--yes`).
-4. Then the React + Vite + Fastify reference stack, behind the same contracts.
-5. Review and accept or revise ADR-0001 through ADR-0004.
+1. Add the React + Vite + Fastify reference stack (Stage 3) behind the same adapter contract.
+2. Check tool versions more deeply, such as the `wasm-bindgen` crate against the installed `wasm-bindgen` tool, before building.
+3. Review and accept or revise ADR-0001 through ADR-0004.
 
 ## Guardrails
 

@@ -127,6 +127,53 @@ jobs:
       - name: Run tests
         run: cargo test --workspace --all-targets --locked
 
+  # Proves the Leptos + Axum adapter end to end (roadmap Stage 2): FrameStack
+  # plans and builds the reference application, then the server is checked.
+  reference-leptos-axum:
+    name: Rust reference stack (Leptos + Axum)
+    needs: detect
+    if: ${{ needs.detect.outputs.rust == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      # Leptos 0.8 needs Rust 1.88, so this job uses stable, not the 1.85 MSRV.
+      - name: Install stable Rust with the WebAssembly target
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+
+      - name: Cache Rust builds
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: |
+            . -> target
+            examples/rust-leptos-axum -> target
+
+      - name: Cache cargo-leptos
+        id: cargo-leptos-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cargo/bin/cargo-leptos
+          key: cargo-leptos-0.3.12-${{ runner.os }}
+
+      - name: Install cargo-leptos
+        if: steps.cargo-leptos-cache.outputs.cache-hit != 'true'
+        run: cargo install cargo-leptos --locked --version 0.3.12
+
+      - name: Build framestack
+        run: cargo build --locked -p framestack-cli
+
+      - name: Check, plan and build the example through FrameStack
+        run: |
+          target/debug/framestack check --manifest examples/rust-leptos-axum
+          target/debug/framestack plan build --manifest examples/rust-leptos-axum
+          target/debug/framestack build --yes --manifest examples/rust-leptos-axum
+
+      - name: Smoke test the built server
+        run: scripts/smoke-leptos-axum.sh
+
   typescript:
     name: TypeScript stable gate
     needs: detect

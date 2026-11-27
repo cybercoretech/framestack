@@ -6,7 +6,7 @@ FrameStack aims to make it practical to compose modern application stacks withou
 
 The project is being designed around a small, stable core; explicit integration boundaries; contract-first interfaces; and first-class developer tooling.
 
-> **Status:** Early implementation. The `framestack` CLI can create, check and inspect project manifests. It does not build or run applications yet, and no framework integration is supported yet.
+> **Status:** Early implementation. The `framestack` CLI creates, checks and inspects project manifests, and builds and runs Leptos + Axum applications through its first adapter. No other framework is supported yet.
 
 ## Quickstart
 
@@ -20,9 +20,11 @@ framestack check           # validates it; exit code 1 if it has errors
 framestack graph           # components, relationships and build order
 framestack graph --format mermaid
 framestack inspect         # normalized JSON
+framestack plan build      # what a build would run, and the tools it needs
+framestack build --yes     # run it
 ```
 
-See the [CLI reference](docs/reference/cli.md) and the [manifest reference](docs/reference/manifest.md).
+See the [CLI reference](docs/reference/cli.md), the [manifest reference](docs/reference/manifest.md) and the [adapters](docs/reference/adapters.md). A working Leptos + Axum application is in [examples/rust-leptos-axum](examples/rust-leptos-axum/README.md).
 
 ## Project goals
 
@@ -58,8 +60,10 @@ framestack/
 │   └── framestack-cli/   # The framestack command
 ├── fixtures/manifest/    # Shared valid, invalid and warning manifests
 ├── packages/             # TypeScript packages (introduced with implementation)
-├── integrations/         # Optional framework and service adapters
-├── examples/             # Runnable reference applications
+├── integrations/
+│   └── framestack-leptos-axum/  # Leptos + Axum adapter (plans cargo-leptos)
+├── examples/
+│   └── rust-leptos-axum/ # Reference application, built in CI through FrameStack
 ├── schemas/              # JSON Schema for the normalized manifest
 ├── website/              # Docusaurus documentation site
 ├── scripts/              # Maintainer and development scripts
@@ -80,6 +84,6 @@ pnpm install && pnpm run check                        # documentation site
 
 The minimum supported Rust version is 1.85, and CI tests it as well as stable. Node.js follows `.nvmrc`.
 
-The application model, manifest format and validation rules exist. The adapter boundary and the first reference stack (Leptos + Axum, [ADR-0007](docs/decisions/0007-reference-stacks.md)) are next; see [PROJECT_STATE.md](PROJECT_STATE.md).
+The application model, manifest validation, the adapter boundary and the first reference stack (Leptos + Axum, [ADR-0007](docs/decisions/0007-reference-stacks.md)) exist. The TypeScript reference stack is next; see [PROJECT_STATE.md](PROJECT_STATE.md).
 
 Read [CONTRIBUTING.md](CONTRIBUTING.md) before proposing architectural or implementation changes.
