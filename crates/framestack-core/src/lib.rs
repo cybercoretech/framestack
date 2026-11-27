@@ -5,11 +5,15 @@ pub mod capability;
 mod diagnostic;
 pub mod graph;
 mod manifest;
+mod plan;
 mod validate;
 
 pub use diagnostic::{Code, Diagnostic, Location, Severity};
 pub use manifest::{
     Component, ComponentKind, MANIFEST_FILE, Manifest, Project, Relationship, RelationshipType,
+};
+pub use plan::{
+    Adapter, Effect, IntegrationDescriptor, Operation, Plan, Step, ToolRequirement, plan_project,
 };
 pub use validate::{SUPPORTED_VERSIONS, validate};
 
