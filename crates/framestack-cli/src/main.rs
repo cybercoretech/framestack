@@ -1,6 +1,7 @@
 //! `framestack`: create, check and inspect FrameStack project manifests.
 
 mod adapters;
+mod execute;
 mod probe;
 mod render;
 
@@ -64,6 +65,23 @@ enum Command {
     Inspect {
         #[command(flatten)]
         manifest: ManifestArg,
+    },
+    /// Build every component. Shows the plan; runs it only with --yes.
+    Build {
+        #[command(flatten)]
+        manifest: ManifestArg,
+        /// Run the plan. Without it, nothing runs.
+        #[arg(long)]
+        yes: bool,
+    },
+    /// Start every component's development server. Shows the plan; runs it
+    /// only with --yes.
+    Dev {
+        #[command(flatten)]
+        manifest: ManifestArg,
+        /// Run the plan. Without it, nothing runs.
+        #[arg(long)]
+        yes: bool,
     },
     /// Show what `build` or `dev` would run, and check the tools it needs.
     /// Runs only the tools' version commands.
@@ -163,6 +181,8 @@ fn run(cli: Cli) -> Result<ExitCode> {
             );
             Ok(ExitCode::SUCCESS)
         }
+        Command::Build { manifest, yes } => execute(&manifest.manifest, Operation::Build, yes),
+        Command::Dev { manifest, yes } => execute(&manifest.manifest, Operation::DevStart, yes),
         Command::Plan {
             operation,
             manifest,
@@ -187,6 +207,38 @@ fn run(cli: Cli) -> Result<ExitCode> {
                 Ok(ExitCode::from(EXIT_INVALID))
             }
         }
+    }
+}
+
+/// `build` and `dev`: show the plan, then run it only when approved.
+fn execute(argument: &Path, operation: Operation, yes: bool) -> Result<ExitCode> {
+    let (root, plan) = match planned(argument, operation)? {
+        Ok(planned) => planned,
+        Err(code) => return Ok(code),
+    };
+    let tools = probe::probe(&plan.tools);
+    print!("{}", render::plan_text(&root, &plan, &tools));
+    let missing = probe::missing(&tools);
+    if !missing.is_empty() {
+        print!("{}", render::diagnostics_text(&missing));
+        return Ok(ExitCode::from(EXIT_INVALID));
+    }
+    if !yes {
+        eprintln!("nothing was run; re-run with --yes to run these steps");
+        return Ok(ExitCode::from(EXIT_FAILURE));
+    }
+    if plan.steps.is_empty() {
+        return Ok(ExitCode::SUCCESS);
+    }
+    println!();
+    let results = execute::run(&root, &plan);
+    print!("{}", render::results_text(&results));
+    let failures = execute::failures(&results);
+    if failures.is_empty() {
+        Ok(ExitCode::SUCCESS)
+    } else {
+        print!("{}", render::diagnostics_text(&failures));
+        Ok(ExitCode::from(EXIT_INVALID))
     }
 }
 

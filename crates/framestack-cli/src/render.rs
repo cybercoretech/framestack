@@ -282,3 +282,23 @@ pub fn plan_json(
         "tools": tools,
     }))
 }
+
+/// One line per step that ran: its ID, outcome and how long it took.
+pub fn results_text(results: &[crate::execute::StepResult]) -> String {
+    use crate::execute::StepOutcome;
+    let mut out = String::new();
+    for result in results {
+        let outcome = match result.outcome {
+            StepOutcome::Succeeded => "ok",
+            StepOutcome::Failed { .. } => "failed",
+            StepOutcome::NotStarted { .. } => "not started",
+        };
+        let _ = writeln!(
+            out,
+            "{}  {outcome}  ({:.1}s)",
+            result.id,
+            result.duration.as_secs_f64()
+        );
+    }
+    out
+}
