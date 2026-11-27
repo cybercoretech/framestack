@@ -2,9 +2,17 @@
   "config": {
     "default": true,
     "MD013": false,
-    "MD033": false
+    "MD024": { "siblings_only": true },
+    "MD025": { "front_matter_title": "" },
+    "MD033": false,
+    "MD041": { "front_matter_title": "" }
   },
   "globs": [
     "**/*.md"
+  ],
+  "ignores": [
+    "**/node_modules/**",
+    // PR template text becomes the PR body, which starts below GitHub's title.
+    ".github/pull_request_template.md"
   ]
 }

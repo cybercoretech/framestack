@@ -91,7 +91,6 @@ The comprehensive documentation standard is maintained at `docs/documentation/ST
 The platform and standards have been formally selected and documented. The Docusaurus application, custom theme, search configuration, hosting workflow, generated reference pipelines, and release snapshot automation are subsequent implementation work; do not represent them as operational until built and verified.
 <!-- FRAMESTACK-DOCS-STATUS:END -->
 
-
 <!-- FRAMESTACK-DOCS-SITE-STATUS:START -->
 ## Docusaurus website foundation
 

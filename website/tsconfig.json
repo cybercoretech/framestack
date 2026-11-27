@@ -5,6 +5,7 @@
     "paths": {
       "@site/*": ["./*"]
     },
+    "types": ["@docusaurus/module-type-aliases", "@docusaurus/theme-classic"],
     "strict": true,
     "noEmit": true
   },

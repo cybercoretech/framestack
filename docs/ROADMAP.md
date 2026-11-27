@@ -221,7 +221,6 @@ Stage 0 is not complete until the remaining ADR review and toolchain-baseline wo
 Do not create empty placeholder pages merely to fill the navigation structure. Do not claim generated references, tested examples, or release snapshots exist until the corresponding workflows have been implemented and verified.
 <!-- FRAMESTACK-DOCS-PLATFORM:END -->
 
-
 <!-- FRAMESTACK-DOCS-SITE:START -->
 ## Docusaurus website foundation
 

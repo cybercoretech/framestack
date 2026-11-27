@@ -35,7 +35,7 @@ The documentation tree may contain public product documentation and internal eng
 Create directories and pages when there is substantive content to publish. The following is the target information architecture, not a requirement to create empty directories or placeholder pages immediately.
 
 | Area | Purpose |
-|---|---|
+| --- | --- |
 | `getting-started/` | Installation, prerequisites, first project, first successful workflow |
 | `concepts/` | Terminology, component model, project graph, capabilities, adapters, lifecycle |
 | `guides/` | Task-oriented workflows and practical recipes |
@@ -354,7 +354,7 @@ Documentation CI should be introduced incrementally and must test what it claims
 The target checks are:
 
 | Check | Expected validation |
-|---|---|
+| --- | --- |
 | Markdown lint | Consistent Markdown style and valid structure |
 | MDX build | MDX parses and the site compiles |
 | Link validation | Internal links, anchors, and configured external links |

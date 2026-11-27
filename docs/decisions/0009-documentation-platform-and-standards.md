@@ -16,7 +16,7 @@ The project also needs a clear distinction between canonical documentation sourc
 FrameStack will use the following documentation platform and conventions:
 
 | Area | Decision |
-|---|---|
+| --- | --- |
 | Documentation engine | Docusaurus 3.x |
 | Documentation format | Markdown and MDX |
 | Website implementation | TypeScript and React |

@@ -16,7 +16,11 @@ const config: Config = {
   trailingSlash: false,
 
   onBrokenLinks: 'throw',
-  onBrokenMarkdownLinks: 'throw',
+  markdown: {
+    hooks: {
+      onBrokenMarkdownLinks: 'throw',
+    },
+  },
 
   i18n: {
     defaultLocale: 'en',
@@ -29,6 +33,7 @@ const config: Config = {
   headTags: [
     {
       tagName: 'script',
+      attributes: {},
       innerHTML: `
         window.SITE = {
           defaultTheme: 'cybercore-tech',
@@ -88,6 +93,8 @@ const config: Config = {
         hashed: true,
         language: ['en'],
         indexDocs: true,
+        docsDir: '../docs',
+        docsRouteBasePath: 'docs',
         indexBlog: false,
         indexPages: false,
       },
@@ -136,7 +143,7 @@ const config: Config = {
           title: 'Documentation',
           items: [
             {label: 'Documentation standards', to: '/docs/documentation/STANDARDS'},
-            {label: 'Architecture decisions', to: '/docs/decisions/0001-project-scope'},
+            {label: 'Architecture decisions', to: '/docs/decisions/project-scope'},
           ],
         },
       ],
