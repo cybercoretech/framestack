@@ -3,8 +3,9 @@
 #
 # Run after `framestack build --yes --manifest examples/rust-leptos-axum`.
 # Starts the built server on a local port, checks that it serves the
-# server-rendered page, the health route and the WebAssembly client, and
-# always stops the server on exit.
+# server-rendered page, the health route and the WebAssembly client, checks
+# in headless Chrome or Chromium that the page hydrates, and always stops the
+# server on exit.
 #
 # Usage: scripts/smoke-leptos-axum.sh [PORT]   (default port 3080)
 set -euo pipefail
@@ -68,6 +69,7 @@ echo "smoke: GET /healthz -> ok"
 page="$(curl -fsS "$base/")" || fail "GET / did not respond"
 [[ "$page" == *"FrameStack reference: Leptos + Axum"* ]] || fail "GET / is missing the heading"
 [[ "$page" == *"Clicked 0 times"* ]] || fail "GET / is missing the server-rendered counter"
+[[ "$page" == *"Not hydrated yet"* ]] || fail "GET / should come from the server unhydrated"
 echo "smoke: GET / -> server-rendered page with the counter"
 
 wasm="/pkg/$name.wasm"
@@ -75,5 +77,20 @@ wasm="/pkg/$name.wasm"
 status="$(curl -s -o /dev/null -w '%{http_code}' "$base$wasm")"
 [[ "$status" == "200" ]] || fail "GET $wasm returned $status, expected 200"
 echo "smoke: GET $wasm -> 200"
+
+# Hydration: load the page in headless Chrome or Chromium, let the client
+# run, and check the text that only the browser-side code can set.
+browser=""
+for candidate in google-chrome chromium chromium-browser; do
+  if command -v "$candidate" >/dev/null 2>&1; then
+    browser="$candidate"
+    break
+  fi
+done
+[[ -n "$browser" ]] || fail "no Chrome or Chromium found for the hydration check"
+dom="$("$browser" --headless --disable-gpu --no-sandbox --virtual-time-budget=10000 \
+  --dump-dom "$base/" 2>/dev/null)" || fail "$browser could not load the page"
+[[ "$dom" == *"Hydrated in the browser"* ]] || fail "the page did not hydrate in $browser"
+echo "smoke: $browser -> page hydrated"
 
 echo "smoke: PASS"

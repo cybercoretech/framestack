@@ -47,9 +47,18 @@ fn HomePage() -> impl IntoView {
     let count = RwSignal::new(0);
     let on_click = move |_| *count.write() += 1;
 
+    // Effects run only in the browser, so the server always sends "Not
+    // hydrated yet" and only a working client can change it. CI checks for
+    // the hydrated text (scripts/smoke-leptos-axum.sh).
+    let hydrated = RwSignal::new(false);
+    Effect::new(move |_| hydrated.set(true));
+
     view! {
         <h1>"FrameStack reference: Leptos + Axum"</h1>
         <p>"Rendered on the server by Axum, then hydrated in the browser."</p>
         <button on:click=on_click>{move || format!("Clicked {} times", count.get())}</button>
+        <p id="hydration">
+            {move || if hydrated.get() { "Hydrated in the browser" } else { "Not hydrated yet" }}
+        </p>
     }
 }
