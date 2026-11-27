@@ -6,7 +6,23 @@ FrameStack aims to make it practical to compose modern application stacks withou
 
 The project is being designed around a small, stable core; explicit integration boundaries; contract-first interfaces; and first-class developer tooling.
 
-> **Status:** Blueprint / architecture definition. Framework APIs and integration support are not yet stable.
+> **Status:** Early implementation. The `framestack` CLI can create, check and inspect project manifests. It does not build or run applications yet, and no framework integration is supported yet.
+
+## Quickstart
+
+With Rust 1.85 or newer:
+
+```sh
+cargo install --path crates/framestack-cli
+cd my-project
+framestack init            # writes a starter framestack.toml
+framestack check           # validates it; exit code 1 if it has errors
+framestack graph           # components, relationships and build order
+framestack graph --format mermaid
+framestack inspect         # normalized JSON
+```
+
+See the [CLI reference](docs/reference/cli.md) and the [manifest reference](docs/reference/manifest.md).
 
 ## Project goals
 
@@ -37,11 +53,15 @@ See [the architecture blueprint](docs/BLUEPRINT.md), [the roadmap](docs/ROADMAP.
 framestack/
 ├── .github/              # CI, issue templates, and repository automation
 ├── docs/                 # Architecture, roadmap, and decision records
-├── crates/               # Rust workspace crates (introduced with implementation)
+├── crates/
+│   ├── framestack-core/  # Project model, manifest parsing and validation
+│   └── framestack-cli/   # The framestack command
+├── fixtures/manifest/    # Shared valid, invalid and warning manifests
 ├── packages/             # TypeScript packages (introduced with implementation)
 ├── integrations/         # Optional framework and service adapters
 ├── examples/             # Runnable reference applications
-├── schemas/              # Versioned cross-language contracts
+├── schemas/              # JSON Schema for the normalized manifest
+├── website/              # Docusaurus documentation site
 ├── scripts/              # Maintainer and development scripts
 ├── PROJECT_STATE.md      # Tracked project status and next actions
 └── AGENT_HANDOFF.md      # Local-only agent context; intentionally gitignored
@@ -49,8 +69,17 @@ framestack/
 
 Directories for implementation layers will be added as their APIs are defined; the blueprint does not imply that those integrations are already implemented.
 
-## Development status
+## Development
 
-FrameStack is in the blueprint phase. Initial work should establish the application model, configuration contract, adapter boundary, and CLI responsibilities before committing to a large set of framework-specific dependencies.
+```sh
+cargo test --workspace                                # Rust core and CLI
+cargo clippy --workspace --all-targets -- -D warnings
+cargo fmt --all
+pnpm install && pnpm run check                        # documentation site
+```
+
+The minimum supported Rust version is 1.85, and CI tests it as well as stable. Node.js follows `.nvmrc`.
+
+The application model, manifest format and validation rules exist. The adapter boundary and the first reference stack (Leptos + Axum, [ADR-0007](docs/decisions/0007-reference-stacks.md)) are next; see [PROJECT_STATE.md](PROJECT_STATE.md).
 
 Read [CONTRIBUTING.md](CONTRIBUTING.md) before proposing architectural or implementation changes.

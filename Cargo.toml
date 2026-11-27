@@ -1,0 +1,14 @@
+[workspace]
+resolver = "3"
+members = ["crates/framestack-core", "crates/framestack-cli"]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+license = "MIT"
+repository = "https://github.com/cybercoretech/framestack"
+# Edition 2024 needs 1.85. CI checks this version (ADR-0008).
+rust-version = "1.85"
+
+[workspace.dependencies]
+framestack-core = { path = "crates/framestack-core", version = "0.1.0" }

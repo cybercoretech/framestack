@@ -1,0 +1,10 @@
+# expect: error FS003
+manifest_version = 1
+
+[project]
+name = "fixture"
+
+[[components]]
+id = "Web App"
+kind = "application"
+path = "web"

@@ -1,0 +1,5 @@
+# expect: error FS002
+manifest_version = 2
+
+[project]
+name = "fixture"

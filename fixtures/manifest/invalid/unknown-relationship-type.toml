@@ -1,0 +1,15 @@
+# expect: error FS001
+manifest_version = 1
+
+[project]
+name = "fixture"
+
+[[components]]
+id = "a"
+kind = "service"
+path = "a"
+
+[[relationships]]
+from = "a"
+to = "a"
+type = "depends_on"

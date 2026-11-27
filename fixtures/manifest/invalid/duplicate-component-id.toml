@@ -1,0 +1,15 @@
+# expect: error FS004
+manifest_version = 1
+
+[project]
+name = "fixture"
+
+[[components]]
+id = "web"
+kind = "application"
+path = "web"
+
+[[components]]
+id = "web"
+kind = "service"
+path = "api"

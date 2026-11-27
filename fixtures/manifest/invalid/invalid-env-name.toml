@@ -1,0 +1,11 @@
+# expect: error FS013
+manifest_version = 1
+
+[project]
+name = "fixture"
+
+[[components]]
+id = "api"
+kind = "service"
+path = "api"
+env = ["database-url"]

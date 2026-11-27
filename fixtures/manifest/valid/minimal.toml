@@ -1,0 +1,10 @@
+# expect: valid
+manifest_version = 1
+
+[project]
+name = "fixture"
+
+[[components]]
+id = "app"
+kind = "application"
+path = "."

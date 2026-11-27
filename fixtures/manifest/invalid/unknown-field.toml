@@ -1,0 +1,7 @@
+# expect: error FS001
+manifest_version = 1
+
+[project]
+name = "fixture"
+
+colour = "blue"
