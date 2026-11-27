@@ -1,0 +1,15 @@
+# expect: error FS006
+manifest_version = 1
+
+[project]
+name = "fixture"
+
+[[components]]
+id = "web"
+kind = "application"
+path = "web"
+
+[[relationships]]
+from = "web"
+to = "web"
+type = "communicates_with"

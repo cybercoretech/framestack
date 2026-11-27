@@ -1,0 +1,31 @@
+# expect: valid
+# ADR-0007 Rust reference: one Leptos + Axum application with one lifecycle.
+manifest_version = 1
+
+[project]
+name = "rust-reference"
+description = "Leptos SSR with hydration, served by Axum"
+
+[[components]]
+id = "app"
+kind = "application"
+path = "app"
+language = "rust"
+integrations = ["leptos", "axum"]
+provides = ["frontend.ssr", "frontend.hydration", "http.server"]
+requires = ["frontend.ssr", "http.server"]
+env = ["LEPTOS_SITE_ADDR"]
+
+[components.config.leptos]
+site-root = "target/site"
+
+[[components]]
+id = "db"
+kind = "resource"
+external = "postgres://managed"
+provides = ["persistence.sql"]
+
+[[relationships]]
+from = "app"
+to = "db"
+type = "runtime_dependency"

@@ -1,0 +1,5 @@
+# expect: error FS017
+manifest_version = 1
+
+[project]
+name = "  "

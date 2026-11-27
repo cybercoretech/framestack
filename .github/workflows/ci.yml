@@ -106,6 +106,27 @@ jobs:
       - name: Run tests
         run: cargo test --workspace --all-targets --locked
 
+      - name: Check documentation
+        env:
+          RUSTDOCFLAGS: -D warnings
+        run: cargo doc --workspace --no-deps --locked
+
+  rust-msrv:
+    name: Rust 1.85 (minimum supported)
+    needs: detect
+    if: ${{ needs.detect.outputs.rust == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      # Keep in step with rust-version in Cargo.toml.
+      - name: Install Rust 1.85
+        uses: dtolnay/rust-toolchain@1.85
+
+      - name: Run tests
+        run: cargo test --workspace --all-targets --locked
+
   typescript:
     name: TypeScript stable gate
     needs: detect

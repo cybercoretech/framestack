@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/cybercoretech/framestack/schemas/framestack-manifest-v1.schema.json",
+  "title": "FrameStack manifest, normalized form, version 1",
+  "description": "Structural shape of a framestack.toml after normalization (ADR-0008). Semantic rules such as reference resolution, cycles and capability satisfaction are checked by the FrameStack core, not by this schema.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["manifest_version", "project", "components", "relationships"],
+  "properties": {
+    "manifest_version": { "const": 1 },
+    "project": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "description": { "type": "string" }
+      }
+    },
+    "components": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/component" }
+    },
+    "relationships": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/relationship" }
+    }
+  },
+  "$defs": {
+    "componentId": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9]*([-_][a-z0-9]+)*$"
+    },
+    "integrationId": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9]*([-_.][a-z0-9]+)*$"
+    },
+    "capabilityId": {
+      "type": "string",
+      "pattern": "^[a-z]+(\\.[a-z]+)+$"
+    },
+    "component": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "integrations", "provides", "requires", "env", "config"],
+      "properties": {
+        "id": { "$ref": "#/$defs/componentId" },
+        "kind": { "enum": ["application", "service", "worker", "resource"] },
+        "path": { "type": "string", "minLength": 1 },
+        "external": { "type": "string", "minLength": 1 },
+        "language": { "type": "string" },
+        "runtime": { "type": "string" },
+        "integrations": { "type": "array", "items": { "$ref": "#/$defs/integrationId" } },
+        "provides": { "type": "array", "items": { "$ref": "#/$defs/capabilityId" } },
+        "requires": { "type": "array", "items": { "$ref": "#/$defs/capabilityId" } },
+        "env": {
+          "type": "array",
+          "items": { "type": "string", "pattern": "^[A-Z_][A-Z0-9_]*$" }
+        },
+        "config": {
+          "description": "Integration-specific settings, keyed by integration ID and validated by that integration's adapter.",
+          "type": "object",
+          "propertyNames": { "$ref": "#/$defs/integrationId" },
+          "additionalProperties": { "type": "object" }
+        }
+      }
+    },
+    "relationship": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["from", "to", "type"],
+      "properties": {
+        "from": { "$ref": "#/$defs/componentId" },
+        "to": { "$ref": "#/$defs/componentId" },
+        "type": { "enum": ["build_dependency", "runtime_dependency", "communicates_with"] },
+        "protocol": { "type": "string" }
+      }
+    }
+  }
+}

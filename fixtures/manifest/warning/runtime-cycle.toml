@@ -1,0 +1,25 @@
+# expect: warning FS015
+manifest_version = 1
+
+[project]
+name = "fixture"
+
+[[components]]
+id = "a"
+kind = "service"
+path = "a"
+
+[[components]]
+id = "b"
+kind = "service"
+path = "b"
+
+[[relationships]]
+from = "a"
+to = "b"
+type = "runtime_dependency"
+
+[[relationships]]
+from = "b"
+to = "a"
+type = "runtime_dependency"

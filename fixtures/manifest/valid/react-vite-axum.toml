@@ -1,0 +1,44 @@
+# expect: valid
+# ADR-0007 mixed-language proof: React + Vite frontend, Axum service.
+manifest_version = 1
+
+[project]
+name = "mixed-reference"
+
+[[components]]
+id = "contracts"
+kind = "application"
+path = "contracts"
+language = "rust"
+
+[[components]]
+id = "web"
+kind = "application"
+path = "web"
+language = "typescript"
+integrations = ["react", "vite"]
+requires = ["api.rest"]
+
+[[components]]
+id = "api"
+kind = "service"
+path = "api"
+language = "rust"
+integrations = ["axum"]
+provides = ["http.server", "api.rest"]
+
+[[relationships]]
+from = "web"
+to = "api"
+type = "communicates_with"
+protocol = "http"
+
+[[relationships]]
+from = "web"
+to = "contracts"
+type = "build_dependency"
+
+[[relationships]]
+from = "api"
+to = "contracts"
+type = "build_dependency"

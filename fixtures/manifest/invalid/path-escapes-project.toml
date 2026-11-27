@@ -1,0 +1,10 @@
+# expect: error FS011
+manifest_version = 1
+
+[project]
+name = "fixture"
+
+[[components]]
+id = "api"
+kind = "service"
+path = "../elsewhere"
