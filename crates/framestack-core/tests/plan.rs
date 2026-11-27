@@ -158,6 +158,21 @@ fn adapter_validation_errors_stop_planning() {
 }
 
 #[test]
+fn adapter_diagnostic_paths_are_prefixed_with_the_component() {
+    let m = manifest(
+        "[[components]]\nid = \"db\"\nkind = \"resource\"\nexternal = \"x://y\"\n\
+         [[components]]\nid = \"app\"\nkind = \"application\"\npath = \"app\"\nintegrations = [\"axum\", \"leptos\"]\n",
+    );
+    let adapter = Fake {
+        settings_error: true,
+    };
+
+    let errors = plan_project(&m, &[&adapter], Operation::Build).expect_err("invalid settings");
+
+    assert_eq!(errors[0].path, "components[1].x");
+}
+
+#[test]
 fn invalid_manifest_is_not_planned() {
     let m = manifest(
         "[[components]]\nid = \"app\"\nkind = \"application\"\npath = \"a\"\n\

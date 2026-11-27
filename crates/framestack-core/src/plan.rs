@@ -187,7 +187,12 @@ pub fn plan_project(
                 ),
             ));
         }
-        component_errors.extend(adapter.validate(component));
+        component_errors.extend(
+            adapter
+                .validate(component)
+                .into_iter()
+                .map(|d| within(&at, d)),
+        );
         if !component_errors.is_empty() {
             errors.extend(component_errors);
             continue;
@@ -202,7 +207,7 @@ pub fn plan_project(
                     }
                 }
             }
-            Err(diagnostic) => errors.push(diagnostic),
+            Err(diagnostic) => errors.push(within(&at, diagnostic)),
         }
     }
 
@@ -211,6 +216,17 @@ pub fn plan_project(
     } else {
         Err(errors)
     }
+}
+
+/// Adapters report paths relative to the component; prefix them with the
+/// component's position so they read like every other diagnostic.
+fn within(at: &str, mut diagnostic: Diagnostic) -> Diagnostic {
+    diagnostic.path = if diagnostic.path.is_empty() {
+        at.to_owned()
+    } else {
+        format!("{at}.{}", diagnostic.path)
+    };
+    diagnostic
 }
 
 /// The adapter whose `handles` set equals the component's integrations.
