@@ -70,6 +70,24 @@ pub enum Code {
     /// The same entry appears twice in one list (warning).
     #[serde(rename = "FS018")]
     DuplicateEntry,
+    /// A component declares a capability its adapter does not provide.
+    #[serde(rename = "FS019")]
+    CapabilityNotProvided,
+    /// No adapter handles this component's integrations.
+    #[serde(rename = "FS020")]
+    NoAdapter,
+    /// A required tool is missing or cannot report its version.
+    #[serde(rename = "FS021")]
+    ToolMissing,
+    /// A step failed: non-zero exit, a signal, or it could not start.
+    #[serde(rename = "FS022")]
+    StepFailed,
+    /// An integration setting is not supported by its adapter.
+    #[serde(rename = "FS023")]
+    UnsupportedSetting,
+    /// The adapter cannot perform the requested operation for this component.
+    #[serde(rename = "FS024")]
+    UnsupportedOperation,
 }
 
 impl Code {
@@ -94,6 +112,12 @@ impl Code {
             Code::InvalidIntegrationId => "FS016",
             Code::EmptyProjectName => "FS017",
             Code::DuplicateEntry => "FS018",
+            Code::CapabilityNotProvided => "FS019",
+            Code::NoAdapter => "FS020",
+            Code::ToolMissing => "FS021",
+            Code::StepFailed => "FS022",
+            Code::UnsupportedSetting => "FS023",
+            Code::UnsupportedOperation => "FS024",
         }
     }
 }

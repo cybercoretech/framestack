@@ -308,7 +308,9 @@ dependencies = [
  "assert_cmd",
  "clap",
  "framestack-core",
+ "framestack-leptos-axum",
  "predicates",
+ "serde",
  "serde_json",
  "tempfile",
 ]
@@ -321,6 +323,14 @@ dependencies = [
  "serde",
  "serde_json",
  "toml",
+]
+
+[[package]]
+name = "framestack-leptos-axum"
+version = "0.1.0"
+dependencies = [
+ "framestack-core",
+ "serde_json",
 ]
 
 [[package]]

@@ -1,6 +1,12 @@
 [workspace]
 resolver = "3"
-members = ["crates/framestack-core", "crates/framestack-cli"]
+members = [
+    "crates/framestack-core",
+    "crates/framestack-cli",
+    "integrations/framestack-leptos-axum",
+]
+# The reference application is its own workspace (Leptos needs Rust 1.88).
+exclude = ["examples/rust-leptos-axum"]
 
 [workspace.package]
 version = "0.1.0"
@@ -12,3 +18,4 @@ rust-version = "1.85"
 
 [workspace.dependencies]
 framestack-core = { path = "crates/framestack-core", version = "0.1.0" }
+framestack-leptos-axum = { path = "integrations/framestack-leptos-axum", version = "0.1.0" }

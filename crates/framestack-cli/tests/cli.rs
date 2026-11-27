@@ -340,3 +340,15 @@ fn init_into_a_missing_directory_exits_2() {
         .code(2);
     assert!(!missing.exists(), "init must not create directories");
 }
+
+// ---- reference applications ----------------------------------------------
+
+#[test]
+fn example_leptos_axum_manifest_passes_check() {
+    let manifest = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../examples/rust-leptos-axum");
+    framestack()
+        .args(["check", "--manifest", path_str(&manifest)])
+        .assert()
+        .code(0)
+        .stdout(predicate::str::contains("valid: 1 component"));
+}

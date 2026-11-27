@@ -4,7 +4,7 @@ description: Commands, options and exit codes of the framestack command-line too
 
 # CLI reference
 
-`framestack` creates, checks and inspects [`framestack.toml`](manifest.md) manifests. It does not build or run applications yet; that arrives with the first adapters ([roadmap](../ROADMAP.md)).
+`framestack` creates, checks and inspects [`framestack.toml`](manifest.md) manifests, and builds and runs projects through [adapters](adapters.md). Every command a build would run is shown first, and nothing runs without `--yes`.
 
 ## Install
 
@@ -19,8 +19,8 @@ cargo install --path crates/framestack-cli
 | Code | Meaning |
 | --- | --- |
 | 0 | Success. Warnings may have been printed. |
-| 1 | The manifest has at least one error. |
-| 2 | The command could not run: a file is missing or unreadable, `init` refused to overwrite, or the arguments were wrong. |
+| 1 | The manifest has an error, the project cannot be planned, a required tool is missing, or a step failed. |
+| 2 | The command could not run: a file is missing or unreadable, `init` refused to overwrite, the arguments were wrong, or `build`/`dev` was run without `--yes`. |
 
 ## framestack init
 
@@ -84,3 +84,42 @@ Prints the [normalized JSON](manifest.md#normalized-json) form of a valid manife
 ```sh
 framestack inspect [--manifest PATH]
 ```
+
+## framestack plan
+
+Shows what `build` or `dev` would run, without running it.
+
+```sh
+framestack plan build|dev [--manifest PATH] [--format text|json]
+```
+
+For every step it prints the command, the directory it runs in, the environment variables it reads, and its effects: directories it writes, hosts it contacts, addresses it listens on. Components FrameStack does not build, such as external databases, are listed as not built.
+
+`plan` then checks the tools the steps need by running each tool's version command, such as `cargo leptos --version`, and prints each command it ran with the answer. Those version commands are the only programs `plan` starts. A missing tool is `FS021`, with the install command, and exit code 1.
+
+```text
+plan: build (1 step)
+
+app.build  build the server and the WebAssembly client with cargo-leptos
+  $ cargo leptos build --release
+  in examples/rust-leptos-axum/.
+  writes target
+  network crates.io
+
+tools
+  probe: cargo leptos --version  ->  cargo-leptos 0.3.12
+```
+
+## framestack build and framestack dev
+
+Run the plan for `build` or `dev`.
+
+```sh
+framestack build [--manifest PATH] [--yes]
+framestack dev [--manifest PATH] [--yes]
+```
+
+- Without `--yes`, they print the plan, run nothing, and exit with code 2.
+- With `--yes`, they check the tools first and stop before any step if one is missing (`FS021`). Then each step runs in order, as a program with arguments (never through a shell), with your terminal attached.
+- The first step that fails, is stopped by a signal, or cannot start ends the run with `FS022` and exit code 1. A summary shows each step that ran with `ok`, `failed` or `not started` and how long it took.
+- `dev` steps keep running until you stop them, for example with Ctrl-C.

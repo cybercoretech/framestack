@@ -1,0 +1,63 @@
+# FrameStack reference application: Leptos + Axum (ADR-0007).
+# Based on the leptos-rs/start-axum template. Built with cargo-leptos;
+# run it through FrameStack: framestack build --yes --manifest examples/rust-leptos-axum
+[package]
+name = "framestack-reference-leptos-axum"
+version = "0.1.0"
+edition = "2021"
+# Leptos 0.8 needs Rust 1.88. FrameStack itself supports 1.85; this example
+# is its own workspace so the FrameStack crates are unaffected.
+rust-version = "1.88"
+publish = false
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+leptos = { version = "0.8.23" }
+leptos_router = { version = "0.8" }
+leptos_meta = { version = "0.8" }
+leptos_axum = { version = "0.8.10", optional = true }
+axum = { version = "0.8", optional = true }
+tokio = { version = "1", features = ["rt-multi-thread"], optional = true }
+console_error_panic_hook = { version = "0.1", optional = true }
+# Pinned to match the wasm-bindgen CLI that cargo-leptos uses: the crate and
+# the CLI must be the same version. Update both together.
+wasm-bindgen = { version = "=0.2.129", optional = true }
+
+[features]
+hydrate = ["leptos/hydrate", "dep:console_error_panic_hook", "dep:wasm-bindgen"]
+ssr = [
+    "dep:axum",
+    "dep:tokio",
+    "dep:leptos_axum",
+    "leptos/ssr",
+    "leptos_meta/ssr",
+    "leptos_router/ssr",
+]
+
+# Size-optimized profile for the WebAssembly bundle in release builds.
+[profile.wasm-release]
+inherits = "release"
+opt-level = "z"
+lto = true
+codegen-units = 1
+panic = "abort"
+
+# Its own workspace, so it is never part of the FrameStack workspace.
+[workspace]
+
+[package.metadata.leptos]
+output-name = "framestack-reference-leptos-axum"
+site-root = "target/site"
+site-pkg-dir = "pkg"
+style-file = "style/main.css"
+site-addr = "127.0.0.1:3000"
+reload-port = 3001
+browserquery = "defaults"
+env = "DEV"
+bin-features = ["ssr"]
+bin-default-features = false
+lib-features = ["hydrate"]
+lib-default-features = false
+lib-profile-release = "wasm-release"

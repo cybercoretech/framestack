@@ -1,0 +1,15 @@
+# FrameStack manifest for the Leptos + Axum reference application.
+manifest_version = 1
+
+[project]
+name = "rust-leptos-axum"
+description = "Leptos server-side rendering with hydration, served by Axum"
+
+[[components]]
+id = "app"
+kind = "application"
+path = "."
+language = "rust"
+integrations = ["leptos", "axum"]
+provides = ["frontend.ssr", "frontend.hydration", "http.server"]
+env = ["LEPTOS_SITE_ADDR"]
