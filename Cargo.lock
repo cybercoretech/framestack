@@ -308,7 +308,9 @@ dependencies = [
  "assert_cmd",
  "clap",
  "framestack-core",
+ "framestack-leptos-axum",
  "predicates",
+ "serde",
  "serde_json",
  "tempfile",
 ]

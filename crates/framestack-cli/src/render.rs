@@ -185,3 +185,100 @@ path = "."
 "#
     ))
 }
+
+/// Diagnostics, one per line, then an error and warning count.
+pub fn diagnostics_text(diagnostics: &[framestack_core::Diagnostic]) -> String {
+    let mut out = String::new();
+    for diagnostic in diagnostics {
+        let _ = writeln!(out, "{diagnostic}");
+    }
+    let errors = diagnostics.iter().filter(|d| d.is_error()).count();
+    let _ = writeln!(
+        out,
+        "{}, {}",
+        count(errors, "error"),
+        count(diagnostics.len() - errors, "warning")
+    );
+    out
+}
+
+fn effect_text(effect: &framestack_core::Effect) -> String {
+    use framestack_core::Effect;
+    match effect {
+        Effect::WritesDir(dir) => format!("writes {dir}"),
+        Effect::Network(host) => format!("network {host}"),
+        Effect::ListensOn(address) => format!("listens on {address}"),
+    }
+}
+
+/// A plan as people read it: every step's command, directory and effects,
+/// then the tool checks that were run.
+pub fn plan_text(
+    root: &Path,
+    plan: &framestack_core::Plan,
+    tools: &[crate::probe::ToolStatus],
+) -> String {
+    let mut out = String::new();
+    let _ = writeln!(
+        out,
+        "plan: {} ({})",
+        plan.operation.as_str(),
+        count(plan.steps.len(), "step")
+    );
+    if plan.steps.is_empty() {
+        let _ = writeln!(out, "\nnothing to build");
+    }
+    for step in &plan.steps {
+        let _ = writeln!(out, "\n{}  {}", step.id, step.description);
+        let mut command = step.program.clone();
+        for arg in &step.args {
+            command.push(' ');
+            command.push_str(arg);
+        }
+        let _ = writeln!(out, "  $ {command}");
+        let _ = writeln!(out, "  in {}", root.join(&step.cwd).display());
+        for name in &step.env {
+            let _ = writeln!(out, "  reads {name}");
+        }
+        for effect in &step.effects {
+            let _ = writeln!(out, "  {}", effect_text(effect));
+        }
+        if step.long_running {
+            let _ = writeln!(out, "  runs until stopped");
+        }
+    }
+    if !plan.skipped.is_empty() {
+        let _ = writeln!(
+            out,
+            "\nnot built by FrameStack: {}",
+            plan.skipped.join(", ")
+        );
+    }
+    if !tools.is_empty() {
+        let _ = writeln!(out, "\ntools");
+        for tool in tools {
+            let result = match (&tool.version, &tool.error) {
+                (Some(version), _) => version.clone(),
+                (None, Some(error)) => format!("failed: {error}"),
+                (None, None) => String::new(),
+            };
+            let _ = writeln!(out, "  probe: {}  ->  {result}", tool.probe.join(" "));
+        }
+    }
+    out
+}
+
+/// A plan for scripts: the plan itself, the project root and tool results.
+pub fn plan_json(
+    root: &Path,
+    plan: &framestack_core::Plan,
+    tools: &[crate::probe::ToolStatus],
+) -> serde_json::Result<String> {
+    serde_json::to_string_pretty(&json!({
+        "root": root.display().to_string(),
+        "operation": plan.operation,
+        "steps": plan.steps,
+        "skipped": plan.skipped,
+        "tools": tools,
+    }))
+}

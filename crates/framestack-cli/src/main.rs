@@ -1,5 +1,7 @@
 //! `framestack`: create, check and inspect FrameStack project manifests.
 
+mod adapters;
+mod probe;
 mod render;
 
 use std::fs;
@@ -8,7 +10,7 @@ use std::process::ExitCode;
 
 use anyhow::{Context, Result, bail};
 use clap::{Parser, Subcommand, ValueEnum};
-use framestack_core::{MANIFEST_FILE, Report, check};
+use framestack_core::{MANIFEST_FILE, Manifest, Operation, Plan, Report, check, plan_project};
 
 /// Exit code when the manifest has errors.
 const EXIT_INVALID: u8 = 1;
@@ -63,6 +65,33 @@ enum Command {
         #[command(flatten)]
         manifest: ManifestArg,
     },
+    /// Show what `build` or `dev` would run, and check the tools it needs.
+    /// Runs only the tools' version commands.
+    Plan {
+        #[arg(value_enum)]
+        operation: OperationArg,
+        #[command(flatten)]
+        manifest: ManifestArg,
+        #[arg(long, value_enum, default_value_t = CheckFormat::Text)]
+        format: CheckFormat,
+    },
+}
+
+#[derive(Clone, Copy, ValueEnum)]
+enum OperationArg {
+    /// Build every component.
+    Build,
+    /// Start every component's development server.
+    Dev,
+}
+
+impl From<OperationArg> for Operation {
+    fn from(operation: OperationArg) -> Self {
+        match operation {
+            OperationArg::Build => Operation::Build,
+            OperationArg::Dev => Operation::DevStart,
+        }
+    }
 }
 
 #[derive(clap::Args)]
@@ -134,7 +163,58 @@ fn run(cli: Cli) -> Result<ExitCode> {
             );
             Ok(ExitCode::SUCCESS)
         }
+        Command::Plan {
+            operation,
+            manifest,
+            format,
+        } => {
+            let (root, plan) = match planned(&manifest.manifest, operation.into())? {
+                Ok(planned) => planned,
+                Err(code) => return Ok(code),
+            };
+            let tools = probe::probe(&plan.tools);
+            match format {
+                CheckFormat::Text => print!("{}", render::plan_text(&root, &plan, &tools)),
+                CheckFormat::Json => println!("{}", render::plan_json(&root, &plan, &tools)?),
+            }
+            let missing = probe::missing(&tools);
+            if missing.is_empty() {
+                Ok(ExitCode::SUCCESS)
+            } else {
+                if matches!(format, CheckFormat::Text) {
+                    print!("{}", render::diagnostics_text(&missing));
+                }
+                Ok(ExitCode::from(EXIT_INVALID))
+            }
+        }
     }
+}
+
+/// The directory a manifest's paths are relative to.
+fn project_root(manifest_path: &Path) -> PathBuf {
+    match manifest_path.parent() {
+        Some(parent) if !parent.as_os_str().is_empty() => parent.to_path_buf(),
+        _ => PathBuf::from("."),
+    }
+}
+
+/// Loads, checks and plans. `Err(code)` means problems were printed and the
+/// command should exit with `code`.
+fn planned(argument: &Path, operation: Operation) -> Result<Result<(PathBuf, Plan), ExitCode>> {
+    let (path, report) = load(argument)?;
+    let Some(manifest) = valid_manifest(&path, &report) else {
+        return Ok(Err(ExitCode::from(EXIT_INVALID)));
+    };
+    Ok(plan_for(manifest, operation).map(|plan| (project_root(&path), plan)))
+}
+
+fn plan_for(manifest: &Manifest, operation: Operation) -> Result<Plan, ExitCode> {
+    let adapters = adapters::all();
+    let refs: Vec<&dyn framestack_core::Adapter> = adapters.iter().map(AsRef::as_ref).collect();
+    plan_project(manifest, &refs, operation).map_err(|errors| {
+        print!("{}", render::diagnostics_text(&errors));
+        ExitCode::from(EXIT_INVALID)
+    })
 }
 
 /// Resolves `--manifest` (a file, or a directory holding framestack.toml),
